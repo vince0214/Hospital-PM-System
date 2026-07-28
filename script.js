@@ -5,12 +5,19 @@ const form = document.getElementById("pmForm");
 const tbody = document.querySelector("#table tbody");
 const search = document.getElementById("search");
 
-function renderTable(data = records){
+function updateDashboard(){
+    document.getElementById("total").innerHTML = records.length;
+    let completed = records.filter(r => r.status == "Completed").length;
+    let notcompleted = records.filter(r => r.status == "Not Completed").length;
 
+    document.getElementById("completed").innerHTML = completed;
+    document.getElementById("notcompleted").innerHTML = notcompleted;
+}
+
+function renderTable(data = records){
     tbody.innerHTML = "";
 
-    data.forEach((item,index)=>{
-
+    data.forEach((item, index) => {
         tbody.innerHTML += `
         <tr>
             <td>${item.date}</td>
@@ -18,6 +25,7 @@ function renderTable(data = records){
             <td>${item.computer}</td>
             <td>${item.maintenance}</td>
             <td>${item.technician}</td>
+            <td>${item.work}</td>
             <td>${item.status}</td>
             <td>${item.remarks}</td>
             <td>
@@ -25,17 +33,15 @@ function renderTable(data = records){
             </td>
         </tr>
         `;
-
     });
 
+    updateDashboard();
 }
 
-form.addEventListener("submit",function(e){
-
+form.addEventListener("submit", function(e){
     e.preventDefault();
 
     const record = {
-
         date: document.getElementById("date").value,
         department: document.getElementById("department").value,
         computer: document.getElementById("computer").value,
@@ -44,149 +50,68 @@ form.addEventListener("submit",function(e){
         work: document.getElementById("work").value,
         status: document.getElementById("status").value,
         remarks: document.getElementById("remarks").value
-
     };
 
     records.push(record);
-
-    localStorage.setItem("pmRecords",JSON.stringify(records));
+    localStorage.setItem("pmRecords", JSON.stringify(records));
 
     renderTable();
 
     form.reset();
 
-    document.getElementById("technician").value="Vincent";
-    document.getElementById("work").value="Cleaned System Unit, Updated Windows";
-    document.getElementById("remarks").value="No Issues";
-
+    document.getElementById("technician").value = "Vincent";
+    document.getElementById("work").value = "Cleaned System Unit, Updated Windows";
+    document.getElementById("remarks").value = "No Issues";
 });
 
 function deleteRecord(index){
-
     if(confirm("Delete this record?")){
-
-        records.splice(index,1);
-
-        localStorage.setItem("pmRecords",JSON.stringify(records));
-
+        records.splice(index, 1);
+        localStorage.setItem("pmRecords", JSON.stringify(records));
         renderTable();
-
     }
-
 }
 
-search.addEventListener("keyup",function(){
-
-    const keyword=this.value.toLowerCase();
-
-    const filtered=records.filter(r=>
-
+search.addEventListener("keyup", function(){
+    const keyword = this.value.toLowerCase();
+    const filtered = records.filter(r =>
         r.department.toLowerCase().includes(keyword) ||
-
         r.computer.toLowerCase().includes(keyword)
-
     );
-
     renderTable(filtered);
-
 });
 
-renderTable();
-function updateDashboard(){
-
-document.getElementById("total").innerHTML=records.length;
-
-let completed=records.filter(r=>r.status=="Completed").length;
-
-let notcompleted=records.filter(r=>r.status=="Not Completed").length;
-
-document.getElementById("completed").innerHTML=completed;
-
-document.getElementById("notcompleted").innerHTML=notcompleted;
-
-}
 function printTable(){
-
-    let table=document.getElementById("table").outerHTML;
-
-    let win=window.open("","","width=1000,height=700");
+    let table = document.getElementById("table").outerHTML;
+    let win = window.open("", "", "width=1000,height=700");
 
     win.document.write(`
     <html>
-
     <head>
-
     <title>Hospital IT Preventive Maintenance Report</title>
-
     <style>
-
-    body{
-
-        font-family:Arial;
-
-        padding:20px;
-
-    }
-
-    h2{
-
-        text-align:center;
-
-        color:green;
-
-    }
-
-    table{
-
-        width:100%;
-
-        border-collapse:collapse;
-
-    }
-
-    th,td{
-
-        border:1px solid #000;
-
-        padding:8px;
-
-        text-align:center;
-
-    }
-
-    th{
-
-        background:#198754;
-
-        color:white;
-
-    }
-
+        body{ font-family: Arial; padding: 20px; }
+        h2{ text-align: center; color: green; }
+        table{ width: 100%; border-collapse: collapse; }
+        th, td{ border: 1px solid #000; padding: 8px; text-align: center; }
+        th{ background: #198754; color: white; }
     </style>
-
     </head>
-
     <body>
-
-    <h2>Hospital IT Preventive Maintenance Report</h2>
-
-    ${table}
-
+        <h2>Hospital IT Preventive Maintenance Report</h2>
+        ${table}
     </body>
-
     </html>
-
     `);
 
     win.document.close();
-
     win.print();
-
 }
-const darkBtn=document.getElementById("darkBtn");
 
-darkBtn.addEventListener("click",()=>{
-
-document.body.classList.toggle("dark");
-
+const darkBtn = document.getElementById("darkBtn");
+darkBtn.addEventListener("click", () => {
+    document.body.classList.toggle("dark");
 });
+
+// Initial load
+renderTable();
