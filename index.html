@@ -30,16 +30,33 @@
 
     <div class="card">
 
-        <h2>Add Maintenance Record</h2>
+<h2>Hospital Settings</h2>
 
-        <form id="pmForm">
+<label>Hospital Name</label>
 
-            <div class="row">
+<input
+type="text"
+id="hospitalInput"
+placeholder="Enter Hospital Name">
 
-                <div class="input-box">
-                    <label>Date</label>
-                    <input type="date" id="date" required>
-                </div>
+<br><br>
+
+<label>Hospital Logo</label>
+
+<input
+type="file"
+id="logoInput"
+accept="image/*">
+
+<br><br>
+
+<button onclick="saveHospital()">
+
+💾 Save Settings
+
+</button>
+
+</div>
 
                 <div class="input-box">
                     <label>Department</label>
