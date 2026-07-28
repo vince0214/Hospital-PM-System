@@ -1,9 +1,34 @@
-// Load existing records
+// Load existing records and logo
 let records = JSON.parse(localStorage.getItem("pmRecords")) || [];
+let savedLogo = localStorage.getItem("hospitalLogo") || "";
 
 const form = document.getElementById("pmForm");
 const tbody = document.querySelector("#table tbody");
 const search = document.getElementById("search");
+const logoInput = document.getElementById("logoInput");
+const hospitalLogo = document.getElementById("hospitalLogo");
+
+// Load Logo on Start
+if (savedLogo) {
+    hospitalLogo.src = savedLogo;
+    hospitalLogo.style.display = "block";
+}
+
+// Function para sa Pag-Change/Upload sa Logo
+logoInput.addEventListener("change", function () {
+    const file = this.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            savedLogo = e.target.result;
+            localStorage.setItem("hospitalLogo", savedLogo);
+            hospitalLogo.src = savedLogo;
+            hospitalLogo.style.display = "block";
+            showToast("🖼️ Hospital Logo updated successfully!", "success");
+        };
+        reader.readAsDataURL(file);
+    }
+});
 
 // Helper function para sa Toast Notification
 function showToast(message, type = "success") {
@@ -13,7 +38,7 @@ function showToast(message, type = "success") {
 
     setTimeout(() => {
         toast.className = toast.className.replace(`toast show ${type}`, "toast");
-    }, 3000); // Maintag pagkahuman sa 3 ka segundo
+    }, 3000);
 }
 
 function updateDashboard(){
@@ -74,7 +99,6 @@ form.addEventListener("submit", function(e){
     document.getElementById("work").value = "Cleaned System Unit, Updated Windows";
     document.getElementById("remarks").value = "No Issues";
 
-    // Mo-gawas ang Green Alert
     showToast("✅ Maintenance record added successfully!", "success");
 });
 
@@ -84,7 +108,6 @@ function deleteRecord(index){
         localStorage.setItem("pmRecords", JSON.stringify(records));
         renderTable();
 
-        // Mo-gawas ang Red Alert
         showToast("🗑️ Record deleted successfully!", "danger");
     }
 }
@@ -98,6 +121,7 @@ search.addEventListener("keyup", function(){
     renderTable(filtered);
 });
 
+// PRINT REPORT WITH DYNAMIC LOGO
 function printTable(){
     let rowsHTML = "";
     
@@ -116,6 +140,8 @@ function printTable(){
         `;
     });
 
+    let logoHTML = savedLogo ? `<img src="${savedLogo}" style="max-height: 80px; display: block; margin: 0 auto 10px auto;">` : "";
+
     let win = window.open("", "", "width=1000,height=700");
 
     win.document.write(`
@@ -124,14 +150,18 @@ function printTable(){
         <title>Hospital IT Preventive Maintenance Report</title>
         <style>
             body { font-family: Arial, sans-serif; padding: 20px; }
-            h2 { text-align: center; color: green; margin-bottom: 20px; }
-            table { width: 100%; border-collapse: collapse; }
+            .header-container { text-align: center; margin-bottom: 20px; }
+            h2 { color: green; margin: 5px 0; }
+            table { width: 100%; border-collapse: collapse; margin-top: 10px; }
             th, td { border: 1px solid #000; padding: 8px; text-align: center; }
             th { background-color: #198754; color: white; }
         </style>
     </head>
     <body>
-        <h2>Hospital IT Preventive Maintenance Report</h2>
+        <div class="header-container">
+            ${logoHTML}
+            <h2>Hospital IT Preventive Maintenance Report</h2>
+        </div>
         <table>
             <thead>
                 <tr>
