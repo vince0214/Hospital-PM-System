@@ -81,7 +81,7 @@ search.addEventListener("keyup", function(){
     renderTable(filtered);
 });
 
-// Function sa Pag-Print nga WALAY Action/Delete Column
+// KINI NGA PRINT FUNCTION ANG MAG-TANGTANG SA ACTION & DELETE
 function printTable(){
     let rowsHTML = "";
     
@@ -108,14 +108,14 @@ function printTable(){
         <title>Hospital IT Preventive Maintenance Report</title>
         <style>
             body { font-family: Arial, sans-serif; padding: 20px; }
-            h2 { text-align: center; color: #198754; margin-bottom: 20px; }
+            h2 { text-align: center; color: green; margin-bottom: 20px; }
             table { width: 100%; border-collapse: collapse; }
             th, td { border: 1px solid #000; padding: 8px; text-align: center; }
             th { background-color: #198754; color: white; }
         </style>
     </head>
     <body>
-        <h2>🏥 Hospital IT Preventive Maintenance Report</h2>
+        <h2>Hospital IT Preventive Maintenance Report</h2>
         <table>
             <thead>
                 <tr>
