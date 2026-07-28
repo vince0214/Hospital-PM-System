@@ -5,6 +5,17 @@ const form = document.getElementById("pmForm");
 const tbody = document.querySelector("#table tbody");
 const search = document.getElementById("search");
 
+// Helper function para sa Toast Notification
+function showToast(message, type = "success") {
+    const toast = document.getElementById("toast");
+    toast.innerText = message;
+    toast.className = `toast show ${type}`;
+
+    setTimeout(() => {
+        toast.className = toast.className.replace(`toast show ${type}`, "toast");
+    }, 3000); // Maintag pagkahuman sa 3 ka segundo
+}
+
 function updateDashboard(){
     document.getElementById("total").innerHTML = records.length;
     let completed = records.filter(r => r.status === "Completed").length;
@@ -62,6 +73,9 @@ form.addEventListener("submit", function(e){
     document.getElementById("technician").value = "Vincent";
     document.getElementById("work").value = "Cleaned System Unit, Updated Windows";
     document.getElementById("remarks").value = "No Issues";
+
+    // Mo-gawas ang Green Alert
+    showToast("✅ Maintenance record added successfully!", "success");
 });
 
 function deleteRecord(index){
@@ -69,6 +83,9 @@ function deleteRecord(index){
         records.splice(index, 1);
         localStorage.setItem("pmRecords", JSON.stringify(records));
         renderTable();
+
+        // Mo-gawas ang Red Alert
+        showToast("🗑️ Record deleted successfully!", "danger");
     }
 }
 
@@ -81,7 +98,6 @@ search.addEventListener("keyup", function(){
     renderTable(filtered);
 });
 
-// KINI NGA PRINT FUNCTION ANG MAG-TANGTANG SA ACTION & DELETE
 function printTable(){
     let rowsHTML = "";
     
