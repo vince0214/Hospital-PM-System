@@ -215,7 +215,7 @@ table tr:nth-child(even){
     color:white;
 }
 
-/* Print Setup */
+/* Print Setup - Gi-hide ang Form, Buttons, ug Action/Delete Column */
 @media print {
     #darkBtn, 
     .card:has(#pmForm), 
