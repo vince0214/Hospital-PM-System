@@ -14,44 +14,23 @@
 
 <div class="container">
 
-<div class="header">
-    <h1>🏥 Hospital IT Preventive Maintenance System</h1>
-    <p>Computer Preventive Maintenance Monitoring</p>
-</div>
-    <div class="card">
-
-    <h2>🏥 Hospital Settings</h2>
-
-    <div class="row">
-
-        <div class="input-box">
-            <label>Hospital Name</label>
-            <input
-            type="text"
-            id="hospitalInput"
-            placeholder="Enter Hospital Name">
-        </div>
-
-        <div class="input-box">
-            <label>Hospital Logo</label>
-            <input
-            type="file"
-            id="logoInput"
-            accept="image/*">
-        </div>
-
+    <div class="header">
+        <h1>🏥 Hospital IT Preventive Maintenance System</h1>
+        <p>Computer Preventive Maintenance Monitoring</p>
     </div>
 
-    <button onclick="saveHospital()">
-        💾 Save Settings
-    </button>
-</div>
-
     <div class="card">
 
-<h2>Hospital Settings</h2>
+        <h2>Add Maintenance Record</h2>
 
-<label>Hospital Name</label>
+        <form id="pmForm">
+
+            <div class="row">
+
+                <div class="input-box">
+                    <label>Date</label>
+                    <input type="date" id="date" required>
+                </div>
 
                 <div class="input-box">
                     <label>Department</label>
@@ -68,10 +47,7 @@
                         <option>IT</option>
                         <option>Laboratory</option>
                         <option>Medical Records</option>
-                        <option>Nurse Station 2 </option>
-                        <option>Nurse Station 3 </option>
-                        <option>Nurse Station 4 </option>
-                        <option>Audit Oficce</option>
+                        <option>Nurse Station</option>
                         <option>OR/DR</option>
                         <option>Pharmacy</option>
                         <option>YAKAP Office</option>
@@ -148,9 +124,7 @@ No Issues
 
             <button type="submit">
 
-                ➕ Add Record<button onclick="printTable()">
-🖨 Print Report
-</button>
+                ➕ Add Record
 
             </button>
 
@@ -200,21 +174,3 @@ No Issues
 
 </body>
 </html>
-<div class="dashboard">
-
-    <div class="box">
-        <h2 id="total">0</h2>
-        <p>Total Records</p>
-    </div>
-
-    <div class="box green">
-        <h2 id="completed">0</h2>
-        <p>Completed</p>
-    </div>
-
-    <div class="box red">
-        <h2 id="notcompleted">0</h2>
-        <p>Not Completed</p>
-    </div>
-
-</div>
