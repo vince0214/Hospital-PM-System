@@ -20,41 +20,31 @@
 </div>
     <div class="card">
 
-    <h2>Maintenance Records</h2>
+    <h2>🏥 Hospital Settings</h2>
 
-    <input
-    type="text"
-    id="search"
-    placeholder="🔍 Search Department or Computer Name">
+    <div class="row">
 
-    <br><br>
+        <div class="input-box">
+            <label>Hospital Name</label>
+            <input
+            type="text"
+            id="hospitalInput"
+            placeholder="Enter Hospital Name">
+        </div>
 
-    <table id="table">
+        <div class="input-box">
+            <label>Hospital Logo</label>
+            <input
+            type="file"
+            id="logoInput"
+            accept="image/*">
+        </div>
 
-        <thead>
+    </div>
 
-            <tr>
-
-                <th>Date</th>
-                <th>Department</th>
-                <th>Computer Name</th>
-                <th>Maintenance Type</th>
-                <th>Technician</th>
-                <th>Work Performed</th>
-                <th>Status</th>
-                <th>Remarks</th>
-                <th>Action</th>
-
-            </tr>
-
-        </thead>
-
-        <tbody>
-
-        </tbody>
-
-    </table>
-
+    <button onclick="saveHospital()">
+        💾 Save Settings
+    </button>
 </div>
 
     <div class="card">
