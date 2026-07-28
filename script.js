@@ -92,3 +92,16 @@ search.addEventListener("keyup",function(){
 });
 
 renderTable();
+function updateDashboard(){
+
+document.getElementById("total").innerHTML=records.length;
+
+let completed=records.filter(r=>r.status=="Completed").length;
+
+let notcompleted=records.filter(r=>r.status=="Not Completed").length;
+
+document.getElementById("completed").innerHTML=completed;
+
+document.getElementById("notcompleted").innerHTML=notcompleted;
+
+}
