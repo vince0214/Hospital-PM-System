@@ -7,8 +7,8 @@ const search = document.getElementById("search");
 
 function updateDashboard(){
     document.getElementById("total").innerHTML = records.length;
-    let completed = records.filter(r => r.status == "Completed").length;
-    let notcompleted = records.filter(r => r.status == "Not Completed").length;
+    let completed = records.filter(r => r.status === "Completed").length;
+    let notcompleted = records.filter(r => r.status === "Not Completed").length;
 
     document.getElementById("completed").innerHTML = completed;
     document.getElementById("notcompleted").innerHTML = notcompleted;
@@ -81,25 +81,58 @@ search.addEventListener("keyup", function(){
     renderTable(filtered);
 });
 
+// Function sa Pag-Print nga WALAY Action/Delete Column
 function printTable(){
-    let table = document.getElementById("table").outerHTML;
+    let rowsHTML = "";
+    
+    records.forEach(item => {
+        rowsHTML += `
+        <tr>
+            <td>${item.date}</td>
+            <td>${item.department}</td>
+            <td>${item.computer}</td>
+            <td>${item.maintenance}</td>
+            <td>${item.technician}</td>
+            <td>${item.work}</td>
+            <td>${item.status}</td>
+            <td>${item.remarks}</td>
+        </tr>
+        `;
+    });
+
     let win = window.open("", "", "width=1000,height=700");
 
     win.document.write(`
     <html>
     <head>
-    <title>Hospital IT Preventive Maintenance Report</title>
-    <style>
-        body{ font-family: Arial; padding: 20px; }
-        h2{ text-align: center; color: green; }
-        table{ width: 100%; border-collapse: collapse; }
-        th, td{ border: 1px solid #000; padding: 8px; text-align: center; }
-        th{ background: #198754; color: white; }
-    </style>
+        <title>Hospital IT Preventive Maintenance Report</title>
+        <style>
+            body { font-family: Arial, sans-serif; padding: 20px; }
+            h2 { text-align: center; color: #198754; margin-bottom: 20px; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #000; padding: 8px; text-align: center; }
+            th { background-color: #198754; color: white; }
+        </style>
     </head>
     <body>
-        <h2>Hospital IT Preventive Maintenance Report</h2>
-        ${table}
+        <h2>🏥 Hospital IT Preventive Maintenance Report</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Department</th>
+                    <th>Computer Name</th>
+                    <th>Maintenance Type</th>
+                    <th>Technician</th>
+                    <th>Work Performed</th>
+                    <th>Status</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${rowsHTML}
+            </tbody>
+        </table>
     </body>
     </html>
     `);
