@@ -105,3 +105,81 @@ document.getElementById("completed").innerHTML=completed;
 document.getElementById("notcompleted").innerHTML=notcompleted;
 
 }
+function printTable(){
+
+    let table=document.getElementById("table").outerHTML;
+
+    let win=window.open("","","width=1000,height=700");
+
+    win.document.write(`
+    <html>
+
+    <head>
+
+    <title>Hospital IT Preventive Maintenance Report</title>
+
+    <style>
+
+    body{
+
+        font-family:Arial;
+
+        padding:20px;
+
+    }
+
+    h2{
+
+        text-align:center;
+
+        color:green;
+
+    }
+
+    table{
+
+        width:100%;
+
+        border-collapse:collapse;
+
+    }
+
+    th,td{
+
+        border:1px solid #000;
+
+        padding:8px;
+
+        text-align:center;
+
+    }
+
+    th{
+
+        background:#198754;
+
+        color:white;
+
+    }
+
+    </style>
+
+    </head>
+
+    <body>
+
+    <h2>Hospital IT Preventive Maintenance Report</h2>
+
+    ${table}
+
+    </body>
+
+    </html>
+
+    `);
+
+    win.document.close();
+
+    win.print();
+
+}
