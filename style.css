@@ -188,3 +188,10 @@ border-left:8px solid red;
     background:#3a3a3a;
     color:white;
 }
+.header img{
+
+display:block;
+margin:auto;
+margin-bottom:10px;
+
+}
