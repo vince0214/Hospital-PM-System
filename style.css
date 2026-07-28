@@ -215,10 +215,10 @@ table tr:nth-child(even){
     color:white;
 }
 
-/* Print Setup - Gi-hide ang Form, Buttons, ug Action/Delete Column */
+/* Print Setup - Gi-tago ang Form, Buttons, ug Action Column */
 @media print {
     #darkBtn, 
-    .card:has(#pmForm), 
+    #pmForm, 
     #search, 
     th:last-child, 
     td:last-child {
