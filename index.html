@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hospital IT Preventive Maintenance System</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h1>🏥 Hospital IT Preventive Maintenance System</h1>
+        <p>Computer Preventive Maintenance Monitoring</p>
+    </div>
+
+    <div class="card">
+
+        <h2>Add Maintenance Record</h2>
+
+        <form id="pmForm">
+
+            <div class="row">
+
+                <div class="input-box">
+                    <label>Date</label>
+                    <input type="date" id="date" required>
+                </div>
+
+                <div class="input-box">
+                    <label>Department</label>
+
+                    <select id="department">
+
+                        <option>Accounting</option>
+                        <option>Admin</option>
+                        <option>Billing</option>
+                        <option>Cashier</option>
+                        <option>CSR</option>
+                        <option>ER</option>
+                        <option>HR</option>
+                        <option>IT</option>
+                        <option>Laboratory</option>
+                        <option>Medical Records</option>
+                        <option>Nurse Station</option>
+                        <option>OR/DR</option>
+                        <option>Pharmacy</option>
+                        <option>YAKAP Office</option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <div class="input-box">
+                    <label>Computer Name</label>
+                    <input type="text" id="computer">
+                </div>
+
+                <div class="input-box">
+
+                    <label>Maintenance Type</label>
+
+                    <select id="maintenance">
+
+                        <option>Preventive Maintenance</option>
+                        <option>Corrective Maintenance</option>
+                        <option>Troubleshooting</option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <div class="input-box">
+
+                    <label>Technician</label>
+
+                    <input type="text" id="technician"
+                    value="Vincent"
+                    readonly>
+
+                </div>
+
+                <div class="input-box">
+
+                    <label>Status</label>
+
+                    <select id="status">
+
+                        <option>Completed</option>
+                        <option>Not Completed</option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <label>Work Performed</label>
+
+            <textarea id="work">
+Cleaned System Unit, Updated Windows
+            </textarea>
+
+            <label>Remarks</label>
+
+            <textarea id="remarks">
+No Issues
+            </textarea>
+
+            <br>
+
+            <button type="submit">
+
+                ➕ Add Record
+
+            </button>
+
+        </form>
+
+    </div>
+
+    <div class="card">
+
+        <h2>Maintenance Records</h2>
+
+        <input
+        type="text"
+        id="search"
+        placeholder="Search Department or Computer">
+
+        <table id="table">
+
+            <thead>
+
+            <tr>
+
+                <th>Date</th>
+                <th>Department</th>
+                <th>Computer</th>
+                <th>Maintenance</th>
+                <th>Technician</th>
+                <th>Status</th>
+                <th>Remarks</th>
+                <th>Action</th>
+
+            </tr>
+
+            </thead>
+
+            <tbody>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
