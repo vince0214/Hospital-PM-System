@@ -156,3 +156,35 @@ border-left:8px solid green;
 border-left:8px solid red;
 
 }
+/* Dark Mode */
+
+.dark{
+    background:#1b1b1b;
+    color:white;
+}
+
+.dark .card{
+    background:#2b2b2b;
+    color:white;
+}
+
+.dark input,
+.dark select,
+.dark textarea{
+    background:#3a3a3a;
+    color:white;
+    border:1px solid #666;
+}
+
+.dark table{
+    color:white;
+}
+
+.dark td{
+    border:1px solid #555;
+}
+
+.dark #search{
+    background:#3a3a3a;
+    color:white;
+}
