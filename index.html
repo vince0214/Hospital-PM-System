@@ -15,6 +15,9 @@
 <div class="container">
 
     <div class="header">
+        <!-- Dynamic Logo Holder -->
+        <img id="hospitalLogo" src="" alt="Hospital Logo" style="display:none; max-height: 80px; margin: 0 auto 10px auto;">
+        
         <h1>🏥 Hospital IT Preventive Maintenance System</h1>
        <div class="dashboard">
 
@@ -38,8 +41,13 @@
     </div>
 
     <div class="card">
+        <h2>System Settings & Add Record</h2>
 
-        <h2>Add Maintenance Record</h2>
+        <!-- Option para mag-Change/Upload og Logo -->
+        <div style="background: #f8f9fa; padding: 10px; border-radius: 6px; margin-bottom: 20px; border: 1px dashed #198754;">
+            <label style="margin-bottom: 5px;">🖼️ Change Hospital Logo:</label>
+            <input type="file" id="logoInput" accept="image/*" style="padding: 5px;">
+        </div>
 
         <form id="pmForm">
 
