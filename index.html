@@ -6,41 +6,73 @@
 <title>Hospital IT Preventive Maintenance System</title>
 
 <link rel="stylesheet" href="style.css">
+<style>
+    /* Styling para sa Simple Login Modal */
+    .modal {
+        display: none; 
+        position: fixed; 
+        z-index: 1000; 
+        left: 0; top: 0; 
+        width: 100%; height: 100%; 
+        background-color: rgba(0,0,0,0.6); 
+        justify-content: center; 
+        align-items: center;
+    }
+    .modal-content {
+        background-color: white; 
+        padding: 25px; 
+        border-radius: 8px; 
+        width: 320px; 
+        text-align: center;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    .dark .modal-content {
+        background-color: #222;
+        color: white;
+    }
+    /* Hide admin features by default */
+    .admin-only {
+        display: none;
+    }
+</style>
 </head>
 
 <body>
 
-<button id="darkBtn">🌙 Dark Mode</button>
+<div style="position: absolute; top: 15px; right: 20px; display: flex; gap: 10px;">
+    <button id="loginBtn" onclick="openLoginModal()" style="background: #198754; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer;">🔑 Admin Login</button>
+    <button id="logoutBtn" onclick="logoutAdmin()" style="display: none; background: #dc3545; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer;">🚪 Logout Admin</button>
+    <button id="darkBtn">🌙 Dark Mode</button>
+</div>
 
 <div class="container">
 
     <div class="header">
-        <!-- Dynamic Logo Holder -->
         <img id="hospitalLogo" src="" alt="Hospital Logo" style="display:none; max-height: 80px; margin: 0 auto 10px auto;">
         
         <h1>🏥 Hospital IT Preventive Maintenance System</h1>
-       <div class="dashboard">
+        
+        <div class="dashboard">
+            <div class="box">
+                <h2 id="total">0</h2>
+                <p>Total Records</p>
+            </div>
 
-    <div class="box">
-        <h2 id="total">0</h2>
-        <p>Total Records</p>
-    </div>
+            <div class="box green">
+                <h2 id="completed">0</h2>
+                <p>Completed</p>
+            </div>
 
-    <div class="box green">
-        <h2 id="completed">0</h2>
-        <p>Completed</p>
-    </div>
-
-    <div class="box red">
-        <h2 id="notcompleted">0</h2>
-        <p>Not Completed</p>
-    </div>
-
-</div>
+            <div class="box red">
+                <h2 id="notcompleted">0</h2>
+                <p>Not Completed</p>
+            </div>
+        </div>
         <p>Computer Preventive Maintenance Monitoring</p>
     </div>
 
-    <div class="card">
+    <!-- FORM UG SETTINGS: Makikita lang kung Naka-Admin Login -->
+    <div class="card admin-only" id="adminPanel">
         <h2>System Settings & Add Record</h2>
 
         <!-- Logo ug Backup/Restore Section -->
@@ -50,7 +82,6 @@
                 <input type="file" id="logoInput" accept="image/*" style="padding: 5px;">
             </div>
 
-            <!-- Backup & Restore Buttons -->
             <div>
                 <label style="margin-bottom: 5px;">💾 Database Backup / Restore:</label><br>
                 <button type="button" onclick="exportBackup()" style="background: #0d6efd; padding: 8px 15px; margin-right: 5px;">📥 Backup Data</button>
@@ -60,9 +91,7 @@
         </div>
 
         <form id="pmForm">
-
             <div class="row">
-
                 <div class="input-box">
                     <label>Date</label>
                     <input type="date" id="date" required>
@@ -70,7 +99,6 @@
 
                 <div class="input-box">
                     <label>Department</label>
-
                     <select id="department">
                         <option>Accounting</option>
                         <option>Admin</option>
@@ -89,53 +117,38 @@
                         <option>Pharmacy</option>
                         <option>YAKAP Office</option>
                     </select>
-
                 </div>
-
             </div>
 
             <div class="row">
-
                 <div class="input-box">
                     <label>Computer Name</label>
                     <input type="text" id="computer" required>
                 </div>
 
                 <div class="input-box">
-
                     <label>Maintenance Type</label>
-
                     <select id="maintenance">
                         <option>Preventive Maintenance</option>
                         <option>Corrective Maintenance</option>
                         <option>Troubleshooting</option>
                     </select>
-
                 </div>
-
             </div>
 
             <div class="row">
-
                 <div class="input-box">
-
                     <label>Technician</label>
-
                     <input type="text" id="technician" value="Vincent" readonly>
-
                 </div>
 
                 <div class="input-box">
-
                     <label>Status</label>
-
                     <select id="status">
                         <option>Completed</option>
                         <option>Not Completed</option>
                     </select>
-
                 </div>
-
             </div>
 
             <label>Work Performed</label>
@@ -148,21 +161,22 @@
 
             <button type="submit">➕ Add Record</button>
             <button type="button" onclick="printTable()">🖨 Print Report</button>
-
         </form>
-
     </div>
 
     <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>Maintenance Records</h2>
+            <!-- Print button option para sa public users -->
+            <button type="button" onclick="printTable()" style="background: #198754; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer;">🖨 Print Report</button>
+        </div>
 
-        <h2>Maintenance Records</h2>
-
+        <br>
         <input type="text" id="search" placeholder="🔍 Search Department or Computer Name">
 
         <br><br>
 
         <table id="table">
-
             <thead>
                 <tr>
                     <th>Date</th>
@@ -173,17 +187,27 @@
                     <th>Work Performed</th>
                     <th>Status</th>
                     <th>Remarks</th>
-                    <th>Action</th>
+                    <th class="admin-only">Action</th>
                 </tr>
             </thead>
-
             <tbody>
             </tbody>
-
         </table>
-
     </div>
 
+</div>
+
+<!-- LOGIN MODAL POP-UP -->
+<div id="loginModal" class="modal">
+    <div class="modal-content">
+        <h3>🔒 Admin Login</h3>
+        <p style="font-size: 13px; color: #666;">Enter password to enable editing & settings.</p>
+        <br>
+        <input type="password" id="adminPassword" placeholder="Enter Password" style="width: 90%; padding: 8px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px;">
+        <br>
+        <button onclick="checkPassword()" style="background: #198754; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer;">Login</button>
+        <button onclick="closeLoginModal()" style="background: #6c757d; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
+    </div>
 </div>
 
 <!-- Toast Notification Box -->
