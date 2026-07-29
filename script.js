@@ -1,6 +1,9 @@
-// Load existing records and logo
+// DEFAULT PASSWORD (Pwede nimo usbon)
+const ADMIN_PASSWORD = "admin123"; 
+
 let records = JSON.parse(localStorage.getItem("pmRecords")) || [];
 let savedLogo = localStorage.getItem("hospitalLogo") || "";
+let isAdminLoggedIn = false;
 
 const form = document.getElementById("pmForm");
 const tbody = document.querySelector("#table tbody");
@@ -14,7 +17,55 @@ if (savedLogo) {
     hospitalLogo.style.display = "block";
 }
 
-// Function para sa Pag-Change/Upload sa Logo
+// ================= LOGIN / LOGOUT LOGIC ================= //
+
+function openLoginModal() {
+    document.getElementById("loginModal").style.display = "flex";
+    document.getElementById("adminPassword").focus();
+}
+
+function closeLoginModal() {
+    document.getElementById("loginModal").style.display = "none";
+    document.getElementById("adminPassword").value = "";
+}
+
+function checkPassword() {
+    const inputPass = document.getElementById("adminPassword").value;
+    if (inputPass === ADMIN_PASSWORD) {
+        isAdminLoggedIn = true;
+        closeLoginModal();
+        toggleAdminUI();
+        showToast("🔓 Logged in as Admin!", "success");
+    } else {
+        alert("❌ Mali nga Password!");
+    }
+}
+
+function logoutAdmin() {
+    isAdminLoggedIn = false;
+    toggleAdminUI();
+    showToast("🔒 Logged out successfully!", "danger");
+}
+
+function toggleAdminUI() {
+    const adminElements = document.querySelectorAll(".admin-only");
+    const loginBtn = document.getElementById("loginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    if (isAdminLoggedIn) {
+        adminElements.forEach(el => el.style.display = el.tagName === "TH" || el.tagName === "TD" ? "table-cell" : "block");
+        loginBtn.style.display = "none";
+        logoutBtn.style.display = "inline-block";
+    } else {
+        adminElements.forEach(el => el.style.display = "none");
+        loginBtn.style.display = "inline-block";
+        logoutBtn.style.display = "none";
+    }
+    renderTable();
+}
+
+// ================= LOGO & BACKUP FUNCTIONS ================= //
+
 logoInput.addEventListener("change", function () {
     const file = this.files[0];
     if (file) {
@@ -30,9 +81,6 @@ logoInput.addEventListener("change", function () {
     }
 });
 
-// ================= BACKUP & RESTORE FUNCTIONS ================= //
-
-// 📥 Function para mo-download og Backup JSON File
 function exportBackup() {
     if (records.length === 0 && !savedLogo) {
         alert("Wala pa'y data o logo nga pwedeng i-backup!");
@@ -48,7 +96,6 @@ function exportBackup() {
     const downloadAnchor = document.createElement("a");
     downloadAnchor.setAttribute("href", dataStr);
     
-    // Ngalan sa backup file nga naa'y petsa
     const today = new Date().toISOString().split('T')[0];
     downloadAnchor.setAttribute("download", `PM_System_Backup_${today}.json`);
     
@@ -59,7 +106,6 @@ function exportBackup() {
     showToast("📥 Backup file downloaded successfully!", "success");
 }
 
-// 📤 Function para mo-read ug Restore gikan sa JSON File
 function importBackup(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -84,15 +130,14 @@ function importBackup(event) {
             renderTable();
             showToast("📤 Data & Logo restored successfully!", "success");
         } catch (err) {
-            alert("Siyap/Error sa pag-read sa file! Siguraduha nga sakto nga JSON backup file ang imong gipili.");
+            alert("Error sa pag-read sa file!");
         }
     };
     reader.readAsText(file);
 }
 
-// ============================================================== //
+// ================= SYSTEM FUNCTIONS ================= //
 
-// Helper function para sa Toast Notification
 function showToast(message, type = "success") {
     const toast = document.getElementById("toast");
     toast.innerText = message;
@@ -116,6 +161,8 @@ function renderTable(data = records){
     tbody.innerHTML = "";
 
     data.forEach((item, index) => {
+        let actionTd = isAdminLoggedIn ? `<td class="admin-only"><button onclick="deleteRecord(${index})">Delete</button></td>` : '';
+        
         tbody.innerHTML += `
         <tr>
             <td>${item.date}</td>
@@ -126,9 +173,7 @@ function renderTable(data = records){
             <td>${item.work}</td>
             <td>${item.status}</td>
             <td>${item.remarks}</td>
-            <td>
-                <button onclick="deleteRecord(${index})">Delete</button>
-            </td>
+            ${actionTd}
         </tr>
         `;
     });
@@ -138,6 +183,11 @@ function renderTable(data = records){
 
 form.addEventListener("submit", function(e){
     e.preventDefault();
+
+    if (!isAdminLoggedIn) {
+        alert("Kinahanglan ka mag-Admin Login para makadugang ug record!");
+        return;
+    }
 
     const record = {
         date: document.getElementById("date").value,
@@ -165,6 +215,8 @@ form.addEventListener("submit", function(e){
 });
 
 function deleteRecord(index){
+    if (!isAdminLoggedIn) return;
+
     if(confirm("Delete this record?")){
         records.splice(index, 1);
         localStorage.setItem("pmRecords", JSON.stringify(records));
@@ -183,7 +235,6 @@ search.addEventListener("keyup", function(){
     renderTable(filtered);
 });
 
-// PRINT REPORT WITH DYNAMIC LOGO
 function printTable(){
     let rowsHTML = "";
     
@@ -254,5 +305,5 @@ darkBtn.addEventListener("click", () => {
     document.body.classList.toggle("dark");
 });
 
-// Initial load
-renderTable();
+// Initial state
+toggleAdminUI();
