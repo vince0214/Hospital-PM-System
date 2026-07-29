@@ -43,10 +43,20 @@
     <div class="card">
         <h2>System Settings & Add Record</h2>
 
-        <!-- Option para mag-Change/Upload og Logo -->
-        <div style="background: #f8f9fa; padding: 10px; border-radius: 6px; margin-bottom: 20px; border: 1px dashed #198754;">
-            <label style="margin-bottom: 5px;">🖼️ Change Hospital Logo:</label>
-            <input type="file" id="logoInput" accept="image/*" style="padding: 5px;">
+        <!-- Logo ug Backup/Restore Section -->
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px dashed #198754; display: flex; flex-wrap: wrap; gap: 15px; justify-content: space-between; align-items: center;">
+            <div>
+                <label style="margin-bottom: 5px;">🖼️ Change Hospital Logo:</label>
+                <input type="file" id="logoInput" accept="image/*" style="padding: 5px;">
+            </div>
+
+            <!-- Backup & Restore Buttons -->
+            <div>
+                <label style="margin-bottom: 5px;">💾 Database Backup / Restore:</label><br>
+                <button type="button" onclick="exportBackup()" style="background: #0d6efd; padding: 8px 15px; margin-right: 5px;">📥 Backup Data</button>
+                <input type="file" id="restoreInput" accept=".json" style="display:none;" onchange="importBackup(event)">
+                <button type="button" onclick="document.getElementById('restoreInput').click()" style="background: #ffc107; color: black; padding: 8px 15px;">📤 Restore Data</button>
+            </div>
         </div>
 
         <form id="pmForm">
