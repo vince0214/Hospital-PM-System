@@ -30,6 +30,68 @@ logoInput.addEventListener("change", function () {
     }
 });
 
+// ================= BACKUP & RESTORE FUNCTIONS ================= //
+
+// 📥 Function para mo-download og Backup JSON File
+function exportBackup() {
+    if (records.length === 0 && !savedLogo) {
+        alert("Wala pa'y data o logo nga pwedeng i-backup!");
+        return;
+    }
+
+    const backupData = {
+        records: records,
+        logo: savedLogo
+    };
+
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+    const downloadAnchor = document.createElement("a");
+    downloadAnchor.setAttribute("href", dataStr);
+    
+    // Ngalan sa backup file nga naa'y petsa
+    const today = new Date().toISOString().split('T')[0];
+    downloadAnchor.setAttribute("download", `PM_System_Backup_${today}.json`);
+    
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+
+    showToast("📥 Backup file downloaded successfully!", "success");
+}
+
+// 📤 Function para mo-read ug Restore gikan sa JSON File
+function importBackup(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        try {
+            const importedData = JSON.parse(e.target.result);
+
+            if (importedData.records) {
+                records = importedData.records;
+                localStorage.setItem("pmRecords", JSON.stringify(records));
+            }
+
+            if (importedData.logo) {
+                savedLogo = importedData.logo;
+                localStorage.setItem("hospitalLogo", savedLogo);
+                hospitalLogo.src = savedLogo;
+                hospitalLogo.style.display = "block";
+            }
+
+            renderTable();
+            showToast("📤 Data & Logo restored successfully!", "success");
+        } catch (err) {
+            alert("Siyap/Error sa pag-read sa file! Siguraduha nga sakto nga JSON backup file ang imong gipili.");
+        }
+    };
+    reader.readAsText(file);
+}
+
+// ============================================================== //
+
 // Helper function para sa Toast Notification
 function showToast(message, type = "success") {
     const toast = document.getElementById("toast");
