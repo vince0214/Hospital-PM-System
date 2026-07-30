@@ -30,6 +30,7 @@
         background-color: #222;
         color: white;
     }
+    /* Hide admin elements by default */
     .admin-only {
         display: none;
     }
@@ -231,7 +232,8 @@
                     <th>Technician</th>
                     <th>Status</th>
                     <th>Schedule Alert</th>
-                    <th>Action</th>
+                    <!-- Mopakita ra ang Action header kon Admin -->
+                    <th class="admin-only">Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -245,7 +247,7 @@
 <div id="loginModal" class="modal">
     <div class="modal-content">
         <h3>🔒 Admin Login</h3>
-        <p style="font-size: 13px; color: #666;">Enter password to enable settings & adding records.</p>
+        <p style="font-size: 13px; color: #666;">Enter password to enable editing & settings.</p>
         <br>
         <input type="password" id="adminPassword" placeholder="Enter Password" style="width: 90%; padding: 8px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px;">
         <br>
