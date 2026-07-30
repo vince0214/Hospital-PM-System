@@ -1,5 +1,6 @@
-// DEFAULT PASSWORD (Pwede nimo usbon)
-const ADMIN_PASSWORD = "admin123"; 
+// Dynamic Settings Loaded from LocalStorage
+let adminPassword = localStorage.getItem("pmAdminPass") || "admin123";
+let defaultTechName = localStorage.getItem("pmTechName") || "Vincent";
 
 let records = JSON.parse(localStorage.getItem("pmRecords")) || [];
 let savedLogo = localStorage.getItem("hospitalLogo") || "";
@@ -10,6 +11,9 @@ const tbody = document.querySelector("#table tbody");
 const search = document.getElementById("search");
 const logoInput = document.getElementById("logoInput");
 const hospitalLogo = document.getElementById("hospitalLogo");
+
+// Set default technician name on start
+document.getElementById("technician").value = defaultTechName;
 
 // Load Logo on Start
 if (savedLogo) {
@@ -31,7 +35,7 @@ function closeLoginModal() {
 
 function checkPassword() {
     const inputPass = document.getElementById("adminPassword").value;
-    if (inputPass === ADMIN_PASSWORD) {
+    if (inputPass === adminPassword) {
         isAdminLoggedIn = true;
         closeLoginModal();
         toggleAdminUI();
@@ -43,6 +47,7 @@ function checkPassword() {
 
 function logoutAdmin() {
     isAdminLoggedIn = false;
+    resetForm();
     toggleAdminUI();
     showToast("🔒 Logged out successfully!", "danger");
 }
@@ -62,6 +67,37 @@ function toggleAdminUI() {
         logoutBtn.style.display = "none";
     }
     renderTable();
+}
+
+// ================= DYNAMIC SETTINGS FUNCTIONS ================= //
+
+function openSettingsModal() {
+    document.getElementById("settingTechName").value = defaultTechName;
+    document.getElementById("settingNewPass").value = "";
+    document.getElementById("settingsModal").style.display = "flex";
+}
+
+function closeSettingsModal() {
+    document.getElementById("settingsModal").style.display = "none";
+}
+
+function saveSettings() {
+    const newTech = document.getElementById("settingTechName").value.trim();
+    const newPass = document.getElementById("settingNewPass").value.trim();
+
+    if (newTech) {
+        defaultTechName = newTech;
+        localStorage.setItem("pmTechName", defaultTechName);
+        document.getElementById("technician").value = defaultTechName;
+    }
+
+    if (newPass) {
+        adminPassword = newPass;
+        localStorage.setItem("pmAdminPass", adminPassword);
+    }
+
+    closeSettingsModal();
+    showToast("⚙️ Settings saved successfully!", "success");
 }
 
 // ================= LOGO & BACKUP FUNCTIONS ================= //
@@ -161,7 +197,11 @@ function renderTable(data = records){
     tbody.innerHTML = "";
 
     data.forEach((item, index) => {
-        let actionTd = isAdminLoggedIn ? `<td class="admin-only"><button onclick="deleteRecord(${index})">Delete</button></td>` : '';
+        let actionTd = isAdminLoggedIn ? 
+            `<td class="admin-only">
+                <button class="btn-edit" onclick="editRecord(${index})">✏️ Edit</button>
+                <button class="btn-delete" onclick="deleteRecord(${index})">🗑️ Delete</button>
+            </td>` : '';
         
         tbody.innerHTML += `
         <tr>
@@ -181,13 +221,16 @@ function renderTable(data = records){
     updateDashboard();
 }
 
+// FORM SUBMIT (Handles Add & Update)
 form.addEventListener("submit", function(e){
     e.preventDefault();
 
     if (!isAdminLoggedIn) {
-        alert("Kinahanglan ka mag-Admin Login para makadugang ug record!");
+        alert("Kinahanglan ka mag-Admin Login!");
         return;
     }
+
+    const editIndex = parseInt(document.getElementById("editIndex").value);
 
     const record = {
         date: document.getElementById("date").value,
@@ -200,19 +243,57 @@ form.addEventListener("submit", function(e){
         remarks: document.getElementById("remarks").value
     };
 
-    records.push(record);
+    if (editIndex === -1) {
+        // ADD NEW RECORD
+        records.push(record);
+        showToast("✅ Maintenance record added successfully!", "success");
+    } else {
+        // UPDATE EXISTING RECORD
+        records[editIndex] = record;
+        showToast("✏️ Record updated successfully!", "success");
+    }
+
     localStorage.setItem("pmRecords", JSON.stringify(records));
-
     renderTable();
+    resetForm();
+});
 
+// EDIT RECORD FUNCTION
+function editRecord(index) {
+    const item = records[index];
+    document.getElementById("editIndex").value = index;
+    document.getElementById("date").value = item.date;
+    document.getElementById("department").value = item.department;
+    document.getElementById("computer").value = item.computer;
+    document.getElementById("maintenance").value = item.maintenance;
+    document.getElementById("technician").value = item.technician;
+    document.getElementById("status").value = item.status;
+    document.getElementById("work").value = item.work;
+    document.getElementById("remarks").value = item.remarks;
+
+    // Change UI state to Edit
+    document.getElementById("saveBtn").innerText = "💾 Save Changes";
+    document.getElementById("saveBtn").style.background = "#ffc107";
+    document.getElementById("saveBtn").style.color = "black";
+    document.getElementById("cancelEditBtn").style.display = "inline-block";
+
+    // Scroll back to form
+    document.getElementById("adminPanel").scrollIntoView({ behavior: 'smooth' });
+}
+
+// RESET FORM BACK TO ADD MODE
+function resetForm() {
     form.reset();
-
-    document.getElementById("technician").value = "Vincent";
+    document.getElementById("editIndex").value = "-1";
+    document.getElementById("technician").value = defaultTechName;
     document.getElementById("work").value = "Cleaned System Unit, Updated Windows";
     document.getElementById("remarks").value = "No Issues";
 
-    showToast("✅ Maintenance record added successfully!", "success");
-});
+    document.getElementById("saveBtn").innerText = "➕ Add Record";
+    document.getElementById("saveBtn").style.background = "#198754";
+    document.getElementById("saveBtn").style.color = "white";
+    document.getElementById("cancelEditBtn").style.display = "none";
+}
 
 function deleteRecord(index){
     if (!isAdminLoggedIn) return;
