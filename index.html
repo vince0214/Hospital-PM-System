@@ -7,7 +7,7 @@
 
 <link rel="stylesheet" href="style.css">
 <style>
-    /* Styling para sa Modals */
+    /* Styling para sa Modals ug Badges */
     .modal {
         display: none; 
         position: fixed; 
@@ -30,7 +30,6 @@
         background-color: #222;
         color: white;
     }
-    /* Hide admin features by default */
     .admin-only {
         display: none;
     }
@@ -51,6 +50,18 @@
         border-radius: 4px;
         cursor: pointer;
     }
+    /* Alert Badge Styles */
+    .badge {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: bold;
+        color: white;
+        display: inline-block;
+    }
+    .badge-overdue { background-color: #dc3545; }
+    .badge-soon { background-color: #ffc107; color: #000; }
+    .badge-ok { background-color: #198754; }
 </style>
 </head>
 
@@ -86,6 +97,11 @@
                 <h2 id="notcompleted">0</h2>
                 <p>Not Completed</p>
             </div>
+
+            <div class="box" style="border-left: 8px solid #dc3545;">
+                <h2 id="overdueCount" style="color:#dc3545;">0</h2>
+                <p>⚠️ Overdue Maintenance</p>
+            </div>
         </div>
         <p>Computer Preventive Maintenance Monitoring</p>
     </div>
@@ -110,15 +126,21 @@
         </div>
 
         <form id="pmForm">
-            <!-- Hidden field para mag-track kung Edit or Add mode -->
             <input type="hidden" id="editIndex" value="-1">
 
             <div class="row">
                 <div class="input-box">
-                    <label>Date</label>
-                    <input type="date" id="date" required>
+                    <label>Maintenance Date</label>
+                    <input type="date" id="date" required onchange="autoCalculateNextDate()">
                 </div>
 
+                <div class="input-box">
+                    <label>Next Maintenance Schedule</label>
+                    <input type="date" id="nextDate" required>
+                </div>
+            </div>
+
+            <div class="row">
                 <div class="input-box">
                     <label>Department</label>
                     <select id="department">
@@ -140,14 +162,14 @@
                         <option>YAKAP Office</option>
                     </select>
                 </div>
-            </div>
 
-            <div class="row">
                 <div class="input-box">
                     <label>Computer Name</label>
                     <input type="text" id="computer" required>
                 </div>
+            </div>
 
+            <div class="row">
                 <div class="input-box">
                     <label>Maintenance Type</label>
                     <select id="maintenance">
@@ -156,9 +178,7 @@
                         <option>Troubleshooting</option>
                     </select>
                 </div>
-            </div>
 
-            <div class="row">
                 <div class="input-box">
                     <label>Technician</label>
                     <input type="text" id="technician" readonly>
@@ -190,7 +210,6 @@
     <div class="card">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <h2>Maintenance Records</h2>
-            <!-- USA RA KA PRINT BUTTON DIRI SA TAAS SA TABLE -->
             <button type="button" onclick="printTable()" style="background: #198754; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">🖨 Print Report</button>
         </div>
 
@@ -203,13 +222,13 @@
             <thead>
                 <tr>
                     <th>Date</th>
+                    <th>Next Due Date</th>
                     <th>Department</th>
                     <th>Computer Name</th>
                     <th>Maintenance Type</th>
                     <th>Technician</th>
-                    <th>Work Performed</th>
                     <th>Status</th>
-                    <th>Remarks</th>
+                    <th>Schedule Alert</th>
                     <th class="admin-only">Action</th>
                 </tr>
             </thead>
@@ -233,7 +252,7 @@
     </div>
 </div>
 
-<!-- SETTINGS MODAL (CHANGE PASSWORD & TECH NAME) -->
+<!-- SETTINGS MODAL -->
 <div id="settingsModal" class="modal">
     <div class="modal-content">
         <h3>⚙️ Admin Settings</h3>
@@ -251,7 +270,6 @@
     </div>
 </div>
 
-<!-- Toast Notification Box -->
 <div id="toast" class="toast"></div>
 
 <script src="script.js"></script>
