@@ -21,6 +21,16 @@ if (savedLogo) {
     hospitalLogo.style.display = "block";
 }
 
+// Auto Calculate Next PM Date (3 Months Default)
+function autoCalculateNextDate() {
+    const currentDate = document.getElementById("date").value;
+    if (currentDate) {
+        let d = new Date(currentDate);
+        d.setMonth(d.getMonth() + 3); // Auto 3 months advance
+        document.getElementById("nextDate").value = d.toISOString().split('T')[0];
+    }
+}
+
 // ================= LOGIN / LOGOUT LOGIC ================= //
 
 function openLoginModal() {
@@ -69,7 +79,7 @@ function toggleAdminUI() {
     renderTable();
 }
 
-// ================= DYNAMIC SETTINGS FUNCTIONS ================= //
+// ================= DYNAMIC SETTINGS ================= //
 
 function openSettingsModal() {
     document.getElementById("settingTechName").value = defaultTechName;
@@ -100,7 +110,7 @@ function saveSettings() {
     showToast("⚙️ Settings saved successfully!", "success");
 }
 
-// ================= LOGO & BACKUP FUNCTIONS ================= //
+// ================= LOGO & BACKUP ================= //
 
 logoInput.addEventListener("change", function () {
     const file = this.files[0];
@@ -123,11 +133,7 @@ function exportBackup() {
         return;
     }
 
-    const backupData = {
-        records: records,
-        logo: savedLogo
-    };
-
+    const backupData = { records: records, logo: savedLogo };
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
     const downloadAnchor = document.createElement("a");
     downloadAnchor.setAttribute("href", dataStr);
@@ -150,19 +156,16 @@ function importBackup(event) {
     reader.onload = function (e) {
         try {
             const importedData = JSON.parse(e.target.result);
-
             if (importedData.records) {
                 records = importedData.records;
                 localStorage.setItem("pmRecords", JSON.stringify(records));
             }
-
             if (importedData.logo) {
                 savedLogo = importedData.logo;
                 localStorage.setItem("hospitalLogo", savedLogo);
                 hospitalLogo.src = savedLogo;
                 hospitalLogo.style.display = "block";
             }
-
             renderTable();
             showToast("📤 Data & Logo restored successfully!", "success");
         } catch (err) {
@@ -170,6 +173,29 @@ function importBackup(event) {
         }
     };
     reader.readAsText(file);
+}
+
+// ================= ALERT CALCULATION LOGIC ================= //
+
+function getScheduleAlert(nextDateStr) {
+    if (!nextDateStr) return { badgeHTML: '<span class="badge badge-ok">N/A</span>', isOverdue: false };
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const nextDate = new Date(nextDateStr);
+    nextDate.setHours(0, 0, 0, 0);
+
+    const diffTime = nextDate - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) {
+        return { badgeHTML: `<span class="badge badge-overdue">🔴 OVERDUE (${Math.abs(diffDays)}d)</span>`, isOverdue: true };
+    } else if (diffDays <= 7) {
+        return { badgeHTML: `<span class="badge badge-soon">🟡 DUE SOON (${diffDays}d)</span>`, isOverdue: false };
+    } else {
+        return { badgeHTML: `<span class="badge badge-ok">🟢 UP TO DATE</span>`, isOverdue: false };
+    }
 }
 
 // ================= SYSTEM FUNCTIONS ================= //
@@ -189,8 +215,16 @@ function updateDashboard(){
     let completed = records.filter(r => r.status === "Completed").length;
     let notcompleted = records.filter(r => r.status === "Not Completed").length;
 
+    let overdueCount = 0;
+    records.forEach(r => {
+        if (r.nextDate && getScheduleAlert(r.nextDate).isOverdue) {
+            overdueCount++;
+        }
+    });
+
     document.getElementById("completed").innerHTML = completed;
     document.getElementById("notcompleted").innerHTML = notcompleted;
+    document.getElementById("overdueCount").innerHTML = overdueCount;
 }
 
 function renderTable(data = records){
@@ -202,17 +236,19 @@ function renderTable(data = records){
                 <button class="btn-edit" onclick="editRecord(${index})">✏️ Edit</button>
                 <button class="btn-delete" onclick="deleteRecord(${index})">🗑️ Delete</button>
             </td>` : '';
-        
+
+        let alertInfo = getScheduleAlert(item.nextDate);
+
         tbody.innerHTML += `
         <tr>
             <td>${item.date}</td>
+            <td><strong>${item.nextDate || 'N/A'}</strong></td>
             <td>${item.department}</td>
             <td>${item.computer}</td>
             <td>${item.maintenance}</td>
             <td>${item.technician}</td>
-            <td>${item.work}</td>
             <td>${item.status}</td>
-            <td>${item.remarks}</td>
+            <td>${alertInfo.badgeHTML}</td>
             ${actionTd}
         </tr>
         `;
@@ -221,7 +257,7 @@ function renderTable(data = records){
     updateDashboard();
 }
 
-// FORM SUBMIT (Handles Add & Update)
+// FORM SUBMIT
 form.addEventListener("submit", function(e){
     e.preventDefault();
 
@@ -234,6 +270,7 @@ form.addEventListener("submit", function(e){
 
     const record = {
         date: document.getElementById("date").value,
+        nextDate: document.getElementById("nextDate").value,
         department: document.getElementById("department").value,
         computer: document.getElementById("computer").value,
         maintenance: document.getElementById("maintenance").value,
@@ -244,11 +281,9 @@ form.addEventListener("submit", function(e){
     };
 
     if (editIndex === -1) {
-        // ADD NEW RECORD
         records.push(record);
         showToast("✅ Maintenance record added successfully!", "success");
     } else {
-        // UPDATE EXISTING RECORD
         records[editIndex] = record;
         showToast("✏️ Record updated successfully!", "success");
     }
@@ -258,11 +293,11 @@ form.addEventListener("submit", function(e){
     resetForm();
 });
 
-// EDIT RECORD FUNCTION
 function editRecord(index) {
     const item = records[index];
     document.getElementById("editIndex").value = index;
     document.getElementById("date").value = item.date;
+    document.getElementById("nextDate").value = item.nextDate || "";
     document.getElementById("department").value = item.department;
     document.getElementById("computer").value = item.computer;
     document.getElementById("maintenance").value = item.maintenance;
@@ -271,17 +306,14 @@ function editRecord(index) {
     document.getElementById("work").value = item.work;
     document.getElementById("remarks").value = item.remarks;
 
-    // Change UI state to Edit
     document.getElementById("saveBtn").innerText = "💾 Save Changes";
     document.getElementById("saveBtn").style.background = "#ffc107";
     document.getElementById("saveBtn").style.color = "black";
     document.getElementById("cancelEditBtn").style.display = "inline-block";
 
-    // Scroll back to form
     document.getElementById("adminPanel").scrollIntoView({ behavior: 'smooth' });
 }
 
-// RESET FORM BACK TO ADD MODE
 function resetForm() {
     form.reset();
     document.getElementById("editIndex").value = "-1";
@@ -302,7 +334,6 @@ function deleteRecord(index){
         records.splice(index, 1);
         localStorage.setItem("pmRecords", JSON.stringify(records));
         renderTable();
-
         showToast("🗑️ Record deleted successfully!", "danger");
     }
 }
@@ -320,14 +351,15 @@ function printTable(){
     let rowsHTML = "";
     
     records.forEach(item => {
+        let alertInfo = getScheduleAlert(item.nextDate);
         rowsHTML += `
         <tr>
             <td>${item.date}</td>
+            <td>${item.nextDate || 'N/A'}</td>
             <td>${item.department}</td>
             <td>${item.computer}</td>
             <td>${item.maintenance}</td>
             <td>${item.technician}</td>
-            <td>${item.work}</td>
             <td>${item.status}</td>
             <td>${item.remarks}</td>
         </tr>
@@ -360,11 +392,11 @@ function printTable(){
             <thead>
                 <tr>
                     <th>Date</th>
+                    <th>Next Due Date</th>
                     <th>Department</th>
                     <th>Computer Name</th>
                     <th>Maintenance Type</th>
                     <th>Technician</th>
-                    <th>Work Performed</th>
                     <th>Status</th>
                     <th>Remarks</th>
                 </tr>
@@ -386,5 +418,4 @@ darkBtn.addEventListener("click", () => {
     document.body.classList.toggle("dark");
 });
 
-// Initial state
 toggleAdminUI();
