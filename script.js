@@ -26,7 +26,7 @@ function autoCalculateNextDate() {
     const currentDate = document.getElementById("date").value;
     if (currentDate) {
         let d = new Date(currentDate);
-        d.setMonth(d.getMonth() + 3); // Auto 3 months advance
+        d.setMonth(d.getMonth() + 3);
         document.getElementById("nextDate").value = d.toISOString().split('T')[0];
     }
 }
@@ -68,7 +68,7 @@ function toggleAdminUI() {
     const logoutBtn = document.getElementById("logoutBtn");
 
     if (isAdminLoggedIn) {
-        adminElements.forEach(el => el.style.display = el.tagName === "TH" || el.tagName === "TD" ? "table-cell" : "block");
+        adminElements.forEach(el => el.style.display = "block");
         loginBtn.style.display = "none";
         logoutBtn.style.display = "inline-block";
     } else {
@@ -231,11 +231,12 @@ function renderTable(data = records){
     tbody.innerHTML = "";
 
     data.forEach((item, index) => {
-        let actionTd = isAdminLoggedIn ? 
-            `<td class="admin-only">
+        // PERMANENTE NGA MAGPAKITA ANG EDIT UG DELETE BUTTONS
+        let actionTd = `
+            <td>
                 <button class="btn-edit" onclick="editRecord(${index})">✏️ Edit</button>
                 <button class="btn-delete" onclick="deleteRecord(${index})">🗑️ Delete</button>
-            </td>` : '';
+            </td>`;
 
         let alertInfo = getScheduleAlert(item.nextDate);
 
@@ -260,11 +261,6 @@ function renderTable(data = records){
 // FORM SUBMIT
 form.addEventListener("submit", function(e){
     e.preventDefault();
-
-    if (!isAdminLoggedIn) {
-        alert("Kinahanglan ka mag-Admin Login!");
-        return;
-    }
 
     const editIndex = parseInt(document.getElementById("editIndex").value);
 
@@ -295,6 +291,10 @@ form.addEventListener("submit", function(e){
 
 function editRecord(index) {
     const item = records[index];
+    
+    // Kon dili naka-login ang Admin, i-open lang ang Admin Panel aron makit-an ang form
+    document.getElementById("adminPanel").style.display = "block";
+
     document.getElementById("editIndex").value = index;
     document.getElementById("date").value = item.date;
     document.getElementById("nextDate").value = item.nextDate || "";
@@ -325,11 +325,13 @@ function resetForm() {
     document.getElementById("saveBtn").style.background = "#198754";
     document.getElementById("saveBtn").style.color = "white";
     document.getElementById("cancelEditBtn").style.display = "none";
+
+    if (!isAdminLoggedIn) {
+        document.getElementById("adminPanel").style.display = "none";
+    }
 }
 
 function deleteRecord(index){
-    if (!isAdminLoggedIn) return;
-
     if(confirm("Delete this record?")){
         records.splice(index, 1);
         localStorage.setItem("pmRecords", JSON.stringify(records));
@@ -351,7 +353,6 @@ function printTable(){
     let rowsHTML = "";
     
     records.forEach(item => {
-        let alertInfo = getScheduleAlert(item.nextDate);
         rowsHTML += `
         <tr>
             <td>${item.date}</td>
