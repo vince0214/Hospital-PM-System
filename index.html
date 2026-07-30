@@ -7,7 +7,7 @@
 
 <link rel="stylesheet" href="style.css">
 <style>
-    /* Styling para sa Simple Login Modal */
+    /* Styling para sa Modals */
     .modal {
         display: none; 
         position: fixed; 
@@ -22,7 +22,7 @@
         background-color: white; 
         padding: 25px; 
         border-radius: 8px; 
-        width: 320px; 
+        width: 360px; 
         text-align: center;
         box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
@@ -34,6 +34,23 @@
     .admin-only {
         display: none;
     }
+    .btn-edit {
+        background-color: #ffc107;
+        color: #000;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-right: 5px;
+    }
+    .btn-delete {
+        background-color: #dc3545;
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
 </style>
 </head>
 
@@ -41,8 +58,9 @@
 
 <div class="container" style="padding-top: 20px;">
 
-    <!-- TOP CONTROL BUTTONS (Gibalhin diri para dili matabonan sa header) -->
+    <!-- TOP CONTROL BUTTONS -->
     <div style="display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 15px;">
+        <button id="settingsBtn" onclick="openSettingsModal()" class="admin-only" style="background: #0d6efd; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">⚙️ Settings</button>
         <button id="loginBtn" onclick="openLoginModal()" style="background: #198754; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">🔑 Admin Login</button>
         <button id="logoutBtn" onclick="logoutAdmin()" style="display: none; background: #dc3545; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">🚪 Logout Admin</button>
         <button id="darkBtn">🌙 Dark Mode</button>
@@ -72,9 +90,9 @@
         <p>Computer Preventive Maintenance Monitoring</p>
     </div>
 
-    <!-- FORM UG SETTINGS: Makikita lang kung Naka-Admin Login -->
+    <!-- FORM UG SETTINGS: Admin Only -->
     <div class="card admin-only" id="adminPanel">
-        <h2>System Settings & Add Record</h2>
+        <h2 id="formTitle">System Settings & Add Record</h2>
 
         <!-- Logo ug Backup/Restore Section -->
         <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px dashed #198754; display: flex; flex-wrap: wrap; gap: 15px; justify-content: space-between; align-items: center;">
@@ -85,13 +103,16 @@
 
             <div>
                 <label style="margin-bottom: 5px;">💾 Database Backup / Restore:</label><br>
-                <button type="button" onclick="exportBackup()" style="background: #0d6efd; padding: 8px 15px; margin-right: 5px;">📥 Backup Data</button>
+                <button type="button" onclick="exportBackup()" style="background: #0d6efd; color:white; padding: 8px 15px; margin-right: 5px; border:none; border-radius:4px;">📥 Backup Data</button>
                 <input type="file" id="restoreInput" accept=".json" style="display:none;" onchange="importBackup(event)">
-                <button type="button" onclick="document.getElementById('restoreInput').click()" style="background: #ffc107; color: black; padding: 8px 15px;">📤 Restore Data</button>
+                <button type="button" onclick="document.getElementById('restoreInput').click()" style="background: #ffc107; color: black; padding: 8px 15px; border:none; border-radius:4px;">📤 Restore Data</button>
             </div>
         </div>
 
         <form id="pmForm">
+            <!-- Hidden field para mag-track kung Edit or Add mode -->
+            <input type="hidden" id="editIndex" value="-1">
+
             <div class="row">
                 <div class="input-box">
                     <label>Date</label>
@@ -140,7 +161,7 @@
             <div class="row">
                 <div class="input-box">
                     <label>Technician</label>
-                    <input type="text" id="technician" value="Vincent" readonly>
+                    <input type="text" id="technician" readonly>
                 </div>
 
                 <div class="input-box">
@@ -160,7 +181,8 @@
 
             <br><br>
 
-            <button type="submit">➕ Add Record</button>
+            <button type="submit" id="saveBtn">➕ Add Record</button>
+            <button type="button" id="cancelEditBtn" onclick="resetForm()" style="display:none; background:#6c757d;">❌ Cancel Edit</button>
             <button type="button" onclick="printTable()">🖨 Print Report</button>
         </form>
     </div>
@@ -168,7 +190,6 @@
     <div class="card">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <h2>Maintenance Records</h2>
-            <!-- Print button option para sa public users -->
             <button type="button" onclick="printTable()" style="background: #198754; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer;">🖨 Print Report</button>
         </div>
 
@@ -198,7 +219,7 @@
 
 </div>
 
-<!-- LOGIN MODAL POP-UP -->
+<!-- LOGIN MODAL -->
 <div id="loginModal" class="modal">
     <div class="modal-content">
         <h3>🔒 Admin Login</h3>
@@ -208,6 +229,24 @@
         <br>
         <button onclick="checkPassword()" style="background: #198754; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer;">Login</button>
         <button onclick="closeLoginModal()" style="background: #6c757d; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
+    </div>
+</div>
+
+<!-- SETTINGS MODAL (CHANGE PASSWORD & TECH NAME) -->
+<div id="settingsModal" class="modal">
+    <div class="modal-content">
+        <h3>⚙️ Admin Settings</h3>
+        <br>
+        <div style="text-align: left; margin-bottom: 12px;">
+            <label style="font-size: 13px; font-weight: bold;">Default Technician Name:</label>
+            <input type="text" id="settingTechName" style="width: 95%; padding: 6px; margin-top: 4px;">
+        </div>
+        <div style="text-align: left; margin-bottom: 15px;">
+            <label style="font-size: 13px; font-weight: bold;">New Admin Password:</label>
+            <input type="password" id="settingNewPass" placeholder="Leave blank if no change" style="width: 95%; padding: 6px; margin-top: 4px;">
+        </div>
+        <button onclick="saveSettings()" style="background: #0d6efd; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer;">Save Settings</button>
+        <button onclick="closeSettingsModal()" style="background: #6c757d; color: white; padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
     </div>
 </div>
 
