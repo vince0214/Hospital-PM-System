@@ -39,13 +39,14 @@
 
 <body>
 
-<div style="position: absolute; top: 15px; right: 20px; display: flex; gap: 10px;">
-    <button id="loginBtn" onclick="openLoginModal()" style="background: #198754; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer;">🔑 Admin Login</button>
-    <button id="logoutBtn" onclick="logoutAdmin()" style="display: none; background: #dc3545; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer;">🚪 Logout Admin</button>
-    <button id="darkBtn">🌙 Dark Mode</button>
-</div>
+<div class="container" style="padding-top: 20px;">
 
-<div class="container">
+    <!-- TOP CONTROL BUTTONS (Gibalhin diri para dili matabonan sa header) -->
+    <div style="display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 15px;">
+        <button id="loginBtn" onclick="openLoginModal()" style="background: #198754; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">🔑 Admin Login</button>
+        <button id="logoutBtn" onclick="logoutAdmin()" style="display: none; background: #dc3545; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">🚪 Logout Admin</button>
+        <button id="darkBtn">🌙 Dark Mode</button>
+    </div>
 
     <div class="header">
         <img id="hospitalLogo" src="" alt="Hospital Logo" style="display:none; max-height: 80px; margin: 0 auto 10px auto;">
